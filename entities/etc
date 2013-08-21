@@ -1,0 +1,23 @@
+# ----------------------------------------------------------------------
+# SOURCE_DIRECTORY 		/etc
+# RSYNC_ARGS 			-axPv --delete-excluded --prune-empty-dirs
+# ----------------------------------------------------------------------
+
+# Universal excludes
+########################
+
+lost+found
+ld.so.cache
+*.log
+*.bak
+
+# Main Excludes 
+########################
+- /etc/modules.conf
+  
+# Several
+########################
+
+# Exclude backup text files
+- *~
+- \#*\#

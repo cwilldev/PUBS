@@ -1,0 +1,29 @@
+# ----------------------------------------------------------------------
+# SOURCE_DIRECTORY 		/var
+# RSYNC_ARGS 			-axPv --delete-excluded --prune-empty-dirs
+# ----------------------------------------------------------------------
+
+# Universal excludes
+########################
+
+lost+found
+ld.so.cache
+*.bak
+
+# Main Excludes
+########################
+
+- /var/cache/
+- /var/crash/
+- /var/lock
+- /var/log/
+- /var/run
+- /var/tmp/
+- /var/lib/sudo/
+  
+# Several
+########################
+
+# Exclude backup text files
+- *~
+- \#*\#

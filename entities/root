@@ -1,0 +1,47 @@
+# ----------------------------------------------------------------------
+# SOURCE_DIRECTORY 		/root
+# RSYNC_ARGS 			-axPv --delete-excluded --prune-empty-dirs
+# ----------------------------------------------------------------------
+
+# Universal excludes
+########################
+
+lost+found
+ld.so.cache
+*.log
+*.bak 
+
+# Filters for home dirs
+########################
+ 
++ /root/
+
+# Cache
+- /root/.cache/
+
+# Downloads
+- /root/Downloads/
+
+# Dropbox
+- /root/Dropbox
+
+# Temporary files / cache
+- /root/.local/share/Trash
+- /root/.cache
+- /root/.Trash
+
+# X Windows System
+- /root/.xsession-errors*
+
+# Several
+########################
+
+# Exclude backup text files
+- *~
+- \#*\#
+
+# Commonly distributed Mac OS X cache
+- .DS_Store
+
+# Commonly distributed Windows cache
+- Thumbs.db

@@ -1,0 +1,28 @@
+# ----------------------------------------------------------------------
+# SOURCE_DIRECTORY 		/opt
+# RSYNC_ARGS 			-axPv --delete-excluded --prune-empty-dirs
+# ----------------------------------------------------------------------
+
+# Universal excludes
+########################
+
+lost+found
+ld.so.cache
+*.log
+*.bak
+
+# Several
+########################
+
+# Exclude backup text files
+- *~
+- \#*\#
+
+# Trash
+- .Trash-*
+
+# Commonly distributed Mac OS X cache
+- .DS_Store
+
+# Commonly distributed Windows cache
+- Thumbs.db

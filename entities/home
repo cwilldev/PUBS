@@ -1,0 +1,78 @@
+# ----------------------------------------------------------------------
+# SOURCE_DIRECTORY 		/home
+# RSYNC_ARGS 			-axPv --delete-excluded --prune-empty-dirs
+# ----------------------------------------------------------------------
+
+# Universal excludes
+########################
+
+lost+found
+ld.so.cache
+*.log
+*.bak
+   
+# Filters for home dirs
+########################
+
++ /home/
++ /home/*/
+
+# Cache
+- /home/*/.cache/
+
+# Downloads
+- /home/*/Downloads/
+
+# Dropbox
+- /home/*/Dropbox
+
+# Temporary files / cache
+- /home/*/.local/share/Trash
+- /home/*/.cache
+- /home/*/.Trash
+
+# X Windows System
+- /home/*/.xsession-errors*
+
+# Several
+########################
+
+# Exclude backup text files
+- *~
+- \#*\#
+
+# Commonly distributed Mac OS X cache
+- .DS_Store
+
+# Commonly distributed Windows cache
+- Thumbs.db
+
+# Common Applications
+########################
+
+# Adobe Reader
+- /home/*/.adobe/**/AssetCache/
+- /home/*/.adobe/**/Cache/
+- /home/*/.adobe/**/Temp/
+- /home/*/.adobe/**/UserCache.bin
+
+# Dropbox temp stuff
+- /home/*/.dropbox/
+- /home/*/.dropbox-dist/
+
+# Gimp
+- /home/*/.gimp-*/tmp
+- /home/*/.gimp-*/swap
+
+# Mozilla Firefox
+- /home/*/.mozilla/firefox/*/Cache/
+- /home/*/.mozilla/firefox/*/lock
+- /home/*/.mozilla/firefox/*/.parentlock
+
+# Mozilla Thunderbird - Do NOT backup emails (profiles only)
+- /home/*/.thunderbird/*/lock
+- /home/*/.thunderbird/*/.parentlock
+- /home/*/.thunderbird/*/ImapMail/
+
+# Pidgin (accounts.xml contains passwords in clear text)
+- /home/*/.purple/accounts.xml

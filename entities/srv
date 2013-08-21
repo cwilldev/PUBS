@@ -1,0 +1,22 @@
+# ----------------------------------------------------------------------
+# SOURCE_DIRECTORY		/srv
+# RSYNC_ARGS 			-axPv --delete-excluded --prune-empty-dirs
+# ----------------------------------------------------------------------
+
+# Universal excludes
+########################
+
+lost+found
+ld.so.cache 
+*.bak
+
+# Main
+########################
+
+  
+# Several
+########################
+
+# Exclude backup text files
+- *~
+- \#*\#
