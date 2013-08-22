@@ -19,6 +19,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+
 # Functions
 ########################################################################
 	
@@ -41,6 +42,14 @@ fi
 
 # Root directory of the backedup files (per definition two levels up)
 BAK_SOURCES="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../" && pwd )/"
+
+# Logfile
+# Redirect stdout & stderr to tmp logfile.
+# Gets copied later to the destination directory.
+log_file=${BAK_SOURCES}'_PUBS_/log/restore.log'
+exec >  >(tee -a ${log_file})
+exec 2> >(tee -a ${log_file} >&2)
+exec 2>&1
 
 
 # Hello World
@@ -126,7 +135,8 @@ echo "> ------------------------------------"
 echo ""
 pause "> Press [Enter] key to continue..."
 apt-get update
-apt-get -y upgrade 
+# TODO Hm.. are you serious ?
+# apt-get -y upgrade 
 echo "> [DONE]" 
 echo ""
 
@@ -143,14 +153,14 @@ pause "> Press [Enter] key to continue..."
 # Solution 1: dpkg selection
 # Damn dpkg.. too bugy to use this simple stuff!
 #dpkg --clear-selections
-#dpkg --set-selections < ${BAK_SOURCES}_myback_/restore/installed-packages.lst 
+#dpkg --set-selections < ${BAK_SOURCES}_PUBS_/restore/installed-packages.lst 
 #apt-get update
 #apt-get dselect-upgrade
 
 # Solution 2: apt-mark
 # Damn apt-mark
-#apt-mark auto $(cat ${BAK_SOURCES}_myback_/restore/pkgs_auto.lst)
-#apt-mark manual $(cat ${BAK_SOURCES}_myback_/restore/pkgs_manual.lst)
+#apt-mark auto $(cat ${BAK_SOURCES}_PUBS_/restore/pkgs_auto.lst)
+#apt-mark manual $(cat ${BAK_SOURCES}_PUBS_/restore/pkgs_manual.lst)
 
 # Solution 3: Manual install packages one-by-one
 while read p; do

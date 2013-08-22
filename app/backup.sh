@@ -302,7 +302,7 @@ cp -R /etc/apt/apt.conf.d/ ${apt_dir}
 cp -R /etc/apt/preferences.d/ ${apt_dir}
 cp -R /var/lib/apt/lists/ ${apt_dir}
 
-apt-key key exportall > ${script_dest_dir}'restore/repositories.keys'
+apt-key exportall > ${script_dest_dir}'restore/repositories.keys'
 
 # Solution 1: dpkg selectiom -> Buggy (as of 12.10), re-import won't work
 dpkg --get-selections > ${script_dest_dir}'restore/installed-packages.lst' 
