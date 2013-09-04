@@ -20,9 +20,13 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-# Functions
 ########################################################################
-	
+#
+# Functions
+#
+########################################################################
+
+
 # Helper method to request user interaction
 # Args
 # 1: Message to display
@@ -31,7 +35,110 @@ function pause() {
 }
 
 
-# Initialization
+# Manage package sources
+# Replace local package sources information with our backup
+# Add repository keys to system
+# Update the sources list
+########################################################################
+function recover_system_package_configuration() {
+
+	echo ""
+	echo "> ------------------------------------------"
+	echo "> 1/4: Recover system package configuration"
+	echo "> ------------------------------------------"
+	
+	echo ""
+	echo "> a) Restore apt directory.."
+	echo "" 
+	cp -R ${BAK_SOURCES}'_PUBS_/restore/apt/*' /etc/apt/
+	
+	# Backup important files from target system
+	# Namely xorg.conf and fstab - in case the system to recover
+	# did run with different partition-configuration and graphic
+	# card
+	echo ""
+	echo "> b) Backup important local system files.."
+	echo ""
+	LOCAL_BAK_DIR=${BAK_SOURCES}'_PUBS_/restore/local_backup'
+	mkdir local_bak_dir
+	cp /etc/X11/xorg.conf ${LOCAL_BAK_DIR}xorg.conf
+	cp /etc/fstab ${LOCAL_BAK_DIR}fstab
+	 
+	echo ""
+	echo "> c) Add repository keys.."
+	echo ""
+	apt-key add ${BAK_SOURCES}_PUBS_/restore/repositories.keys
+		
+	echo ""
+	echo "> d) Update package source lists.."
+	echo ""
+	apt-get update
+	
+	echo ""	
+	echo "> [DONE]" 
+	echo ""
+}
+
+
+# Restore backuped packages
+########################################################################
+function install_packages() {
+
+	echo ""
+	echo "> ------------------------------------"
+	echo "> 2/4: Install packages (long process)"
+	echo "> ------------------------------------"
+	echo "" 
+
+	# dpkg selection 
+	apt-get -y install dselect   # these two lines are to get your 
+	dselect update               # dselect repository up-to-date
+	dpkg --clear-selections
+	dpkg --set-selections < ${BAK_SOURCES}_PUBS_/restore/installed-packages.lst 
+	apt-get -y dselect-upgrade
+	
+	# Remove unneeded packages
+	apt-get -y autoremove
+
+	echo "> [DONE]" 
+	echo ""
+}
+
+
+# Copy backup
+########################################################################
+function recover_files() {
+	echo ""
+	echo "> ------------------------------------"
+	echo "> 3/4: Recover files (long process)"
+	echo "> ------------------------------------"
+	echo ""
+	rsync -av --exclude="/_PUBS_/" ${BAK_SOURCES} /
+	echo "> [DONE]" 
+	echo ""
+}
+
+
+# Reboot
+########################################################################
+function reboot() {
+	echo ""
+	echo "> ------------------------------------"
+	echo "> 4/4: Reboot"
+	echo "> ------------------------------------"
+	echo ""
+	echo "Awesome! We are done."
+	echo "Hope to see you back after reboot :-)"
+	echo ""
+	pause "> Press [Enter] key to finish!"
+	reboot
+}
+
+
+########################################################################
+#
+# START
+# 
 ########################################################################
 
 # We must be lord of the system
@@ -51,6 +158,12 @@ exec >  >(tee -a ${log_file})
 exec 2> >(tee -a ${log_file} >&2)
 exec 2>&1
 
+# Get Ubuntu version
+. /etc/lsb-release
+# $DISTRIB_RELEASE
+# Example to check if version >= 13.04
+# echo "$DISTRIB_RELEASE > 13" | bc
+
 
 # Hello World
 ########################################################################
@@ -59,150 +172,35 @@ echo "= PUBS Recovery Console                                    ="
 echo "============================================================"
 echo ""
 echo "This is the recovery console of PUBS."
-echo "The script will guide you step by step through the recovery."
+echo "Please choose an option and press [Enter]"
 echo ""
-echo "Step 1: Replace package information"
-echo "Step 2: Add repository keys"
-echo "Step 3: Update source lists"
-echo "Step 4: Restore and install packages"
-echo "Step 5: Restore system"
-echo "Step 6: Reboot"
+echo "(1): Recover files only" 
+echo "(2): Full recovery"
 echo ""
-echo "Good luck my friend - may the force be with you!"
-echo "------------------------------------------------------------"
-echo ""
+read userStep
 
-pause "> Press [Enter] key to continue..."
+case "${userStep}" in
 
-echo ""
-echo "============================================================"
-echo "ATTENTION ! ATTENTION ! ATTENTION ! ATTENTION ! ATTENTION"
-echo ""
-echo "Continuing recovery may harm your computer if done "
-echo "unintentionnaly or on wrong device."
-echo ""
-echo "Please double check if this is what you want to do!"
-echo "============================================================"
-echo ""
-
-pause "> Press [Enter] key to continue..."
-
-
-# Replace local package sources information with our backup
-########################################################################
-echo ""
-echo "> ------------------------------------"
-echo "> 1/6: Replace package information"
-echo "> ------------------------------------"
-echo ""
-pause "> Press [Enter] key to continue..."
-BAK_APT_DIR=${BAK_SOURCES}'_PUBS_/restore/apt/'
-cp ${BAK_APT_DIR}'sources.list' /etc/apt/sources.list
-if [ -f ${BAK_APT_DIR}'apt.conf' ]; then
-	cp ${BAK_APT_DIR}'apt.conf' /etc/apt/apt.conf 
-fi
-if [ -f ${BAK_APT_DIR}'preferences' ]; then
-	cp ${BAK_APT_DIR}'preferences' /etc/apt/preferences
-fi
-cp -R ${BAK_APT_DIR}sources.list.d/ /etc/apt/sources.list.d/ 
-cp -R ${BAK_APT_DIR}apt.conf.d/ /etc/apt/apt.conf.d/
-cp -R ${BAK_APT_DIR}preferences.d/ /etc/apt/preferences.d/
-cp -R ${BAK_APT_DIR}lists/ /var/lib/apt/lists/
-echo ""
-echo "> [DONE]" 
-echo "" 
-
-
-# Add repository keys to system
-########################################################################
-echo ""
-echo "> ------------------------------------"
-echo "> 2/6: Add repository keys"
-echo "> ------------------------------------"
-echo ""
-pause "> Press [Enter] key to continue..."
-apt-key add ${BAK_SOURCES}_PUBS_/restore/repositories.keys
-echo "> [DONE]" 
-echo ""
-
-
-# Update the sources list
-########################################################################
-echo ""
-echo "> ------------------------------------"
-echo "> 3/6: Update and upgrade packages"
-echo "> ------------------------------------"
-echo ""
-pause "> Press [Enter] key to continue..."
-apt-get update
-# TODO Hm.. are you serious ?
-# apt-get -y upgrade 
-echo "> [DONE]" 
-echo ""
-
-
-# Restore backuped packages
-########################################################################
-echo ""
-echo "> ------------------------------------"
-echo "> 4/6: Restore packages (long process)"
-echo "> ------------------------------------"
-echo ""
-pause "> Press [Enter] key to continue..."
-
-# Solution 1: dpkg selection
-# Damn dpkg.. too bugy to use this simple stuff!
-#dpkg --clear-selections
-#dpkg --set-selections < ${BAK_SOURCES}_PUBS_/restore/installed-packages.lst 
-#apt-get update
-#apt-get dselect-upgrade
-
-# Solution 2: apt-mark
-# Damn apt-mark
-#apt-mark auto $(cat ${BAK_SOURCES}_PUBS_/restore/pkgs_auto.lst)
-#apt-mark manual $(cat ${BAK_SOURCES}_PUBS_/restore/pkgs_manual.lst)
-
-# Solution 3: Manual install packages one-by-one
-while read p; do
-	if [[ -n "$p" ]]; then
-		
-		echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-		echo "> "${p}
-		echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-
-		apt-get -y install $p
-	fi
-done < ${BAK_SOURCES}_PUBS_/restore/apt-install.lst
-
-# Remove unneeded packages
-apt-get -y autoremove
-
-echo "> [DONE]" 
-echo ""
-
-
-# Copy backup
-########################################################################
-echo ""
-echo "> ------------------------------------"
-echo "> 5/6: Restore system (long process)"
-echo "> ------------------------------------"
-echo ""
-pause "> Press [Enter] key to continue..."
-rsync -av --exclude="/_PUBS_/" ${BAK_SOURCES} /
-echo "> [DONE]" 
-echo ""
-
-# Reboot
-########################################################################
-echo ""
-echo "> ------------------------------------"
-echo "> 6/6: Reboot"
-echo "> ------------------------------------"
-echo ""
-echo "Awesome! We are done."
-echo "Hope to see you back after reboot :-)"
-echo ""
-pause "> Press [Enter] key to finish!"
-reboot
-echo "> [DONE]"
+"1")
+	echo "> ------------------------------------"
+	echo "> This will restore your backup files"
+	echo ""
+	pause "> Press [Enter] key to continue..."
+	echo "> ------------------------------------"
+	recover_files
+	;;
+"2") 
+	echo "> ------------------------------------"
+	echo "> This will restore the FULL system"
+	echo ""
+	pause "> Press [Enter] key to continue..."
+	echo "> ------------------------------------"
+	recover_system_package_configuration
+	install_packages
+	recover_files
+	reboot
+	;;
+*)  
+	echo "Invalid option!"
+	exit; 
+esac

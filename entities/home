@@ -1,6 +1,6 @@
 # ----------------------------------------------------------------------
 # SOURCE_DIRECTORY 		/home
-# RSYNC_ARGS 			-axPv --delete-excluded --prune-empty-dirs
+# RSYNC_ARGS 			-axPv
 # ----------------------------------------------------------------------
 
 # Universal excludes
@@ -29,7 +29,7 @@ ld.so.cache
 # Temporary files / cache
 - /home/*/.local/share/Trash
 - /home/*/.cache
-- /home/*/.Trash
+- /home/*/.Trash*
 
 # X Windows System
 - /home/*/.xsession-errors*

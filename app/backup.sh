@@ -236,6 +236,8 @@ output "============================================================"
 # RSYNC
 #
 #####################################################################################
+
+# Trigger event
 fire_plugin_event "before_process"
 
 for ((i=0;i<${#source_directories[@]};i++)); do
@@ -268,6 +270,7 @@ then
 	ln -s ${cfg_destination_directory}/${date} ${latest_backup_dir} # Re-create
 fi 
 
+# Trigger event
 fire_plugin_event "after_process"
  
  
@@ -275,11 +278,13 @@ fire_plugin_event "after_process"
 #
 # RESTORE PREPARATION
 # 
-# We copy all files that will be required during the recovery to the destination 
-# folder as well.
+# We copy all system relevant files that will be required during the recovery to the 
+# destination folder as well (even though they might already be backed up with rsync,
+# but we need them before syncing the system)
 #
 #####################################################################################
 
+# Trigger event
 fire_plugin_event "before_restore_preparation"
 
 # Create directories
@@ -288,35 +293,14 @@ mkdir ${script_dest_dir}'restore'
 mkdir ${script_dest_dir}'restore/apt'
 mkdir ${script_dest_dir}'log'
 
-# Export list of all installed applications and repository keys
-apt_dir=${script_dest_dir}'restore/apt/'
-cp /etc/apt/sources.list ${apt_dir}'sources.list'
-if [ -f '/etc/apt/apt.conf' ]; then
-   cp /etc/apt/apt.conf ${apt_dir}'apt.conf'
-fi
-if [ -f '/etc/apt/preferences' ]; then
-	cp /etc/apt/preferences ${apt_dir}'preferences'
-fi	
-cp -R /etc/apt/sources.list.d/ ${apt_dir}
-cp -R /etc/apt/apt.conf.d/ ${apt_dir}
-cp -R /etc/apt/preferences.d/ ${apt_dir}
-cp -R /var/lib/apt/lists/ ${apt_dir}
+# Copy apt directory
+cp -R /etc/apt/* ${script_dest_dir}'restore/apt/'
 
+# Export list of all installed applications and repository keys
 apt-key exportall > ${script_dest_dir}'restore/repositories.keys'
 
-# Solution 1: dpkg selectiom -> Buggy (as of 12.10), re-import won't work
+# Save package status
 dpkg --get-selections > ${script_dest_dir}'restore/installed-packages.lst' 
-
-# Solution 2: apt-mark -> Buggy as well (as of 12.10)
-apt-mark showauto > ${script_dest_dir}'restore/pkgs_auto.lst'
-apt-mark showmanual > ${script_dest_dir}'restore/pkgs_manual.lst'
-
-# Solution 3: Manual approach -> Create list of packages to re-install one by on recovery
-package_list=$(dpkg-query -Wf '${Package} ')
-package_list=${package_list// /$'\n'}  # change the semicolons to white space
-for package in $package_list; do
-	echo "$package" >> ${script_dest_dir}'restore/apt-install.lst'
-done
 
 # Copy tmp logfile to current destination directory
 mv ${tmp_log_file} ${script_dest_dir}"log/backup.log"
@@ -328,6 +312,7 @@ cp -R ${PUBS_PATH}'entities/' ${script_dest_dir}
 cp -R ${PUBS_PATH}'plugins/' ${script_dest_dir} 
 cp ${PUBS_PATH}"pubs.cfg" ${script_dest_dir}'/'
 
+# Trigger event
 fire_plugin_event "after_restore_preparation"
 
 

@@ -1,6 +1,6 @@
 # ----------------------------------------------------------------------
 # SOURCE_DIRECTORY 		/opt
-# RSYNC_ARGS 			-axPv --delete-excluded --prune-empty-dirs
+# RSYNC_ARGS 			-axPv
 # ----------------------------------------------------------------------
 
 # Universal excludes
