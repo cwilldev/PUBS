@@ -61,8 +61,8 @@ function recover_system_package_configuration() {
 	echo ""
 	LOCAL_BAK_DIR=${BAK_SOURCES}'_PUBS_/restore/local_backup'
 	mkdir local_bak_dir
-	cp /etc/X11/xorg.conf ${LOCAL_BAK_DIR}xorg.conf
-	cp /etc/fstab ${LOCAL_BAK_DIR}fstab
+	cp /etc/X11/xorg.conf ${LOCAL_BAK_DIR}/xorg.conf
+	cp /etc/fstab ${LOCAL_BAK_DIR}/fstab
 	 
 	echo ""
 	echo "> c) Add repository keys.."
