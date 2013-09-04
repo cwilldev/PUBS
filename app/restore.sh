@@ -121,7 +121,7 @@ function recover_files() {
 
 # Reboot
 ########################################################################
-function reboot() {
+function do_reboot() {
 	echo ""
 	echo "> ------------------------------------"
 	echo "> 4/4: Reboot"
@@ -131,7 +131,7 @@ function reboot() {
 	echo "Hope to see you back after reboot :-)"
 	echo ""
 	pause "> Press [Enter] key to finish!"
-	reboot
+	reboot -f
 }
 
 
@@ -198,7 +198,7 @@ case "${userStep}" in
 	recover_system_package_configuration
 	install_packages
 	recover_files
-	reboot
+	do_reboot
 	;;
 *)  
 	echo "Invalid option!"
